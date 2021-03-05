@@ -30,44 +30,52 @@ do
 			return setmetatable(p, self)
 		end
 		function promise:Then(resolved, rejected)
-			local res, throwed, did
+			local throwed, did
+			local res= {}
 			function Throw(...)
 				self.setState("Rejected")
 				self.args.rej= {...}
 				throwed= true
 			end
 			if self.state=="Fullfilled" then
-				res= resolved(table.unpack(self.args.res), Throw)
+				local params= self.args.res
+				params[#params + 1]= Throw
+				res= table.pack(resolved(table.unpack(params)))
 				did= true
 			elseif self.state=="Rejected" and rejected then
-				res= rejected(table.unpack(self.args.rej), Throw)
+				local params= self.args.rej
+				params[#params + 1]= Throw
+				res= table.pack(rejected(table.unpack(params)))
 				did= true
 			end
-			if res and not throwed then
+			if #res> 0 and not throwed then
 				self.setState("Fullfilled")
-				self.args.res= {res}
+				self.args.res= res
 			end
-			if not res and not throwed and did then
+			if #res== 0 and not throwed and did then
 				self.setState("Settled")
 			end
 			return self
 		end
 		function promise:Catch(callback)
-			local res, throwed, did
+			local throwed, did
+			local res= {}
 			function Throw(...)
 				self.setState("Rejected")
 				self.args.rej= {...}
 				throwed= true
 			end
 			if self.state=="Rejected" then
-				res= callback(table.unpack(self.args.rej), Throw)
+				local params= self.args.rej
+				params[#params + 1]= Throw
+				res= table.pack(callback(table.unpack(params)))
 				did= true
 			end
-			if res and not throwed then
+			if #res> 0 and not throwed then
 				self.setState("Fullfilled")
-				self.args.res= {res}
+				self.args.res= res
 			end
-			if not res and not throwed and did then
+			if #res== 0 and not throwed and did then
 				self.setState("Settled")
 			end
 			return self
