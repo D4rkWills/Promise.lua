@@ -36,14 +36,47 @@ getPoints("Noobloops#0000"):Then(success):Catch(failure)
 getPoints("Jp_darkuss#4806"):Then(success):Catch(failure)
 getPoints("Pigui#5177"):Then(success):Catch(failure)
 ```
-The script includes also the static Methods Promise.all and Promise.race.
 
-This class doesn't have all the characteristics of the Javascript Promise, so pay attention on differences:
+You can use the function ``throw`` to cast a error and set the state of the Promise to "Rejected". You access the function after the parameters of callbacks:
+```lua
+local promise= Promise.new(...)
+promise:Then(function(..., throw)
+	throw(...)
+end, function(..., throw)
+	throw(...)
+end):Catch(function(..., throw)
+	throw(...)
+end):Finnaly(function(throw)
+	throw(...)
+end)
+```
 
-- Differences between Promise Lua and Promise Javascript
+* Tree of the class
 
-1) Promise Lua doesn't work in async mode;
-2) The static methods ``Promise.all`` and ``Promise.race`` cannot return "Settled" or "Pending" Promises;
-3) The methods ``Promise.resolve`` and ``Promise.reject`` doesn't return Promises;
+```lua
+Promise
+	new (function): creates a Promise instance
+	race (function): works like the Js Promise.race
+	all (function): works like the Js Promise.all
+	reject (function): returns a rejected Promise
+	resolve (function): returns a resolved Promise
+Promise instance
+	:Then (function)
+	:Catch (function)
+	:Finnaly (function)
+	:setState (function): set the state of Promise (system function)
+	.state (string)
+	.args (table)
+		.res (table): contains the resolved parameters
+		.rej (table): contains the rejected paramaters
+```
 
+The script includes also the static Methods Promise.all, Promise.race, Promise.resolve and Promise.reject.
+
+DISCLAIMER: Promise.lua doens't work in async mode!!
+
+* #Update
+
+The class now is more similar to the Javascript class
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
 I hope you enjoyed the class, see you soon! <3
